@@ -1,11 +1,16 @@
 extends Area2D
 
+signal hit
+
 @export var speed = 400
 var screen_size #see the "clamp" (used to not let the caracter leave the screen)
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	screen_size = get_viewport_rect().size
+	
+	#why?
+	hide()
 	pass # Replace with function body.
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -33,4 +38,26 @@ func _process(delta: float) -> void:
 	position += velocity * delta
 	position = position.clamp(Vector2.ZERO, screen_size)
 	
+	#to propely choose the animation
+	if velocity.x != 0: 
+		$AnimatedSprite2D.animation = "walk"
+		
+		#flips the sprite if below zero and unflips verticaly
+		$AnimatedSprite2D.flip_h = velocity.x < 0
+		$AnimatedSprite2D.flip_v = false
+	elif velocity.y != 0:
+		$AnimatedSprite2D.animation = "up"
+		
+		$AnimatedSprite2D.flip_v = velocity.y > 0
 	pass
+
+func _on_body_entered(body: Node2D) -> void:
+	hide()
+	hit.emit()
+	#disable the colision to not be hit again
+	$CollisionShape2D.set_deferred("disabled", true)
+
+func start(pos):
+	position = pos
+	show()
+	$CollisionShape2D.disabled = false
