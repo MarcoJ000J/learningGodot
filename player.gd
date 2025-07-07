@@ -1,5 +1,6 @@
 extends Area2D
 
+#important, a signal emited to be handled in another place, interesting
 signal hit
 
 @export var speed = 400
